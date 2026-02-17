@@ -3,132 +3,84 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Snake Mini App</title>
+<title>Fake Hamster</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 <style>
 body {
     margin: 0;
-    background: #0f172a;
+    background: linear-gradient(135deg, #1e293b, #0f172a);
     color: white;
     text-align: center;
     font-family: Arial;
 }
 
-canvas {
-    background: #111827;
-    margin-top: 10px;
-    border-radius: 12px;
+h2 {
+    margin-top: 20px;
 }
 
-.controls {
-    margin-top: 15px;
+#coin {
+    font-size: 28px;
+    margin: 15px 0;
+}
+
+.hamster {
+    width: 180px;
+    transition: transform 0.1s;
+}
+
+.hamster:active {
+    transform: scale(0.9);
 }
 
 button {
-    width: 70px;
-    height: 50px;
-    font-size: 20px;
-    margin: 5px;
+    padding: 12px 25px;
     border-radius: 10px;
     border: none;
+    font-size: 16px;
     background: #2563eb;
     color: white;
+    margin-top: 15px;
 }
 </style>
 </head>
 
 <body>
 
-<h2>🐍 Snake Mini App</h2>
-<p>Score: <span id="score">0</span></p>
+<h2>🐹 Fake Hamster</h2>
 
-<canvas id="game" width="300" height="300"></canvas>
+<div id="coin">💰 0</div>
 
-<div class="controls">
-    <div>
-        <button onclick="setDirection('UP')">↑</button>
-    </div>
-    <div>
-        <button onclick="setDirection('LEFT')">←</button>
-        <button onclick="setDirection('DOWN')">↓</button>
-        <button onclick="setDirection('RIGHT')">→</button>
-    </div>
-</div>
+<img src="https://i.imgur.com/6X4K5YQ.png"
+     class="hamster"
+     onclick="tapHamster()">
+
+<br>
+
+<button onclick="finishGame()">Finish & Send</button>
 
 <script>
 const tg = window.Telegram.WebApp;
 tg.expand();
 
-const canvas = document.getElementById("game");
-const ctx = canvas.getContext("2d");
+let coins = 0;
+let power = 1;
 
-const box = 15;
-let snake = [{x: 150, y: 150}];
-let direction = "RIGHT";
-let food = randomFood();
-let score = 0;
-
-function randomFood() {
-    return {
-        x: Math.floor(Math.random() * 20) * box,
-        y: Math.floor(Math.random() * 20) * box
-    };
+// Tap
+function tapHamster() {
+    coins += power;
+    document.getElementById("coin").innerText = "💰 " + coins;
 }
 
-function setDirection(dir) {
-    direction = dir;
+// Finish
+function finishGame() {
+    tg.sendData(JSON.stringify({
+        coins: coins,
+        user: tg.initDataUnsafe.user?.id
+    }));
+
+    alert("Score yuborildi!");
 }
-
-function draw() {
-    ctx.fillStyle = "#111827";
-    ctx.fillRect(0, 0, 300, 300);
-
-    // Food
-    ctx.fillStyle = "red";
-    ctx.fillRect(food.x, food.y, box, box);
-
-    // Snake
-    ctx.fillStyle = "lime";
-    snake.forEach(part => {
-        ctx.fillRect(part.x, part.y, box, box);
-    });
-
-    let head = {x: snake[0].x, y: snake[0].y};
-
-    if (direction === "LEFT") head.x -= box;
-    if (direction === "RIGHT") head.x += box;
-    if (direction === "UP") head.y -= box;
-    if (direction === "DOWN") head.y += box;
-
-    // Collision
-    if (
-        head.x < 0 || head.y < 0 ||
-        head.x >= 300 || head.y >= 300 ||
-        snake.some(part => part.x === head.x && part.y === head.y)
-    ) {
-        clearInterval(game);
-        alert("Game Over! Score: " + score);
-
-        tg.sendData(JSON.stringify({
-            score: score,
-            user: tg.initDataUnsafe.user?.id
-        }));
-        return;
-    }
-
-    snake.unshift(head);
-
-    if (head.x === food.x && head.y === food.y) {
-        score++;
-        document.getElementById("score").innerText = score;
-        food = randomFood();
-    } else {
-        snake.pop();
-    }
-}
-
-let game = setInterval(draw, 120);
 </script>
 
 </body>
