@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Mini App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Telegram WebApp SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #0f172a;
+      color: white;
+    }
+
+    button {
+      padding: 15px 30px;
+      font-size: 18px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      background: #2563eb;
+      color: white;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>🚀 Telegram Mini App</h1>
+  <p id="user"></p>
+
+  <button onclick="sendData()">Backendga yuborish</button>
+
+  <script>
+    const tg = window.Telegram.WebApp;
+
+    tg.expand(); // to‘liq ekran qilish
+
+    // User ma’lumotini chiqarish
+    const user = tg.initDataUnsafe.user;
+
+    if (user) {
+      document.getElementById("user").innerText =
+        "Salom, " + user.first_name;
+    }
+
+    function sendData() {
+      tg.sendData(JSON.stringify({
+        message: "Salom backend",
+        user_id: user?.id
+      }));
+    }
+  </script>
+
+</body>
+</html>
